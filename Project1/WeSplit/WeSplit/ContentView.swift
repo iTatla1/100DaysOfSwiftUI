@@ -10,18 +10,25 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var checkAmount = ""
-    @State private var numberOfPeople = 2
+    @State private var numberOfPeople = "2"
     @State private var tipPercentage = 2
     
     let tipPercentages = [5,10,20,25]
     
     var totalPerPerson: Double {
         //Calculate total per person
-        let peopleCount = Double(numberOfPeople + 2)
+        let numOfPeople = Double(numberOfPeople) ?? 1
+        let peopleCount = numOfPeople == 0 ? 1 : numOfPeople
         let tipSelection = Double(tipPercentages[tipPercentage])
         let checkValue = Double(checkAmount) ?? 0
         
         return (checkValue + (checkValue  * (tipSelection/100)))/peopleCount
+    }
+    
+    var totalExpense: Double {
+        let tipSelection = Double(tipPercentages[tipPercentage])
+        let checkValue = Double(checkAmount) ?? 0
+        return (checkValue + (checkValue  * (tipSelection/100)))
     }
     
     var body: some View {
@@ -29,11 +36,8 @@ struct ContentView: View {
             Form {
                 Section {
                     TextField("Amount", text: $checkAmount).keyboardType(.decimalPad)
-                    Picker("Number of People", selection: $numberOfPeople) {
-                        ForEach(2 ..< 100) {
-                            Text("\($0)" + " people")
-                        }
-                    }
+                    TextField("Number of People", text: $numberOfPeople).keyboardType(.decimalPad)
+                    
                 }
                 
                 Section(header: Text("How much tip do you want to leave?")) {
@@ -44,7 +48,11 @@ struct ContentView: View {
                     }.pickerStyle(SegmentedPickerStyle())
                 }
                 
-                Section {
+                Section(header: Text("Total Expenditure including Tip")){
+                    Text("Amount: $\(totalExpense, specifier: "%.2f")")
+                }
+                
+                Section(header: Text("Amount per person")) {
                     Text("Total per person : $\(totalPerPerson, specifier:  "%.2f")")
                 }
                 
